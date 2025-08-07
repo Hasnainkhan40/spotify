@@ -1,0 +1,245 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:spotify/common/helpers/is_dark_mode.dart';
+import 'package:spotify/core/configs/assets/app_images.dart';
+import 'package:spotify/core/configs/theme/app_colors.dart';
+import 'package:spotify/domain/entities/song/song.dart';
+import 'package:spotify/presentation/auth/pages/signup.dart';
+import 'package:spotify/presentation/favoritesongs/favaritessong.dart';
+import 'package:spotify/presentation/home/widgets/news_songs.dart';
+import 'package:spotify/presentation/home/widgets/play_list.dart';
+import 'package:spotify/presentation/profile/pages/profile.dart';
+import 'package:spotify/presentation/song_player/pages/song_player.dart';
+// import 'package:spotify/presentation/profile/pages/profile.dart';
+
+import '../../../common/widgets/appbar/app_bar.dart';
+import '../../../core/configs/assets/app_vectors.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  int _selectedIndex = 0;
+  late final SongEntity songEntity;
+  late List<Widget> _pages;
+
+  final List<IconData> _icons = [
+    Icons.home_rounded,
+    Icons.play_arrow_rounded,
+    Icons.favorite_sharp,
+    Icons.person_outline,
+  ];
+
+  final List<String> _labels = ['Home', 'play', 'Favorite', 'Profile'];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+
+    final songEntity = SongEntity(
+      title: 'Sample Song',
+      artist: 'Sample Artist',
+      songUrl: 'https://example.com/sample.mp3',
+      imageUrl: 'https://example.com/sample.jpg',
+      duration: 3.21,
+      songId: "",
+      isFavorite: false,
+      releaseDate: Timestamp.now(),
+    );
+
+    // ✅ Initialize _pages *after* songEntity is created
+    _pages = [
+      const HomePage(),
+      SongPlayerPage(songEntity: songEntity),
+      const Favaritessong(),
+      const ProfilePage(),
+    ];
+  }
+
+  void _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => SignupPage()),
+      (route) => false,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Container(
+          height: 70,
+          decoration: BoxDecoration(
+            color: const Color(0xFF1C1C1E), // Background of the nav bar
+            borderRadius: BorderRadius.circular(50),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(_icons.length, (index) {
+              final bool isSelected = _selectedIndex == index;
+              return GestureDetector(
+                onTap: () => _onItemTapped(index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        isSelected
+                            ? const Color(0xff42C83C)
+                            : Colors.transparent,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _icons[index],
+                        color: isSelected ? Colors.white : Colors.grey[400],
+                      ),
+                      if (isSelected) ...[
+                        const SizedBox(width: 8),
+                        Text(
+                          _labels[index],
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ),
+      appBar:
+          _selectedIndex == 3
+              ? AppBar(
+                backgroundColor: Color(0xff2C2B2B),
+
+                title: Padding(
+                  padding: EdgeInsets.only(left: 135),
+                  child: Text('Profile', style: TextStyle(fontSize: 30)),
+                ),
+
+                actions: [
+                  IconButton(
+                    icon: Icon(Icons.logout),
+                    onPressed: () => _logout(context),
+                  ),
+                ],
+              )
+              : BasicAppbar(
+                hideBack: true,
+                action: IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => const ProfilePage(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.person),
+                ),
+                title: SvgPicture.asset(AppVectors.logo, height: 40, width: 40),
+              ),
+      body:
+          _selectedIndex == 0
+              ? SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _homeTopCard(),
+                    _tabs(),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: const [
+                          NewsSongs(),
+                          Center(child: Text("Videos")),
+                          Center(child: Text("Artists")),
+                          Center(child: Text("Podcasts")),
+                        ],
+                      ),
+                    ),
+                    const PlayList(),
+                  ],
+                ),
+              )
+              : _pages[_selectedIndex], // Show player, profile, etc.
+    );
+  }
+
+  Widget _homeTopCard() {
+    return Center(
+      child: SizedBox(
+        height: 140,
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SvgPicture.asset(AppVectors.homeTopCard),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 60),
+                child: Image.asset(AppImages.homeArtist),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _tabs() {
+    return TabBar(
+      controller: _tabController,
+      isScrollable: true,
+      labelColor: context.isDarkMode ? Colors.white : Colors.black,
+      indicatorColor: AppColors.primary,
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+      tabs: const [
+        Text(
+          'News',
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+        ),
+        Text(
+          'Videos',
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+        ),
+        Text(
+          'Artists',
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+        ),
+        Text(
+          'Podcasts',
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+        ),
+      ],
+    );
+  }
+}
