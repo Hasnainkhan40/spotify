@@ -14,6 +14,7 @@ abstract class AuthFirebaseService {
   Future<Either> signin(SigninUserReq signinUserReq);
 
   Future<Either<String, UserEntity>> getUser();
+  Future<Either<String, String>> resetPassword(String email);
 }
 
 class AuthFirebaseServiceImpl extends AuthFirebaseService {
@@ -51,6 +52,7 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
         'name': createUserReq.fullName,
         'email': data.user?.email,
         'imageUrl': data.user?.photoURL,
+        'password': createUserReq.password,
       });
 
       return const Right('Signup was Successful');
@@ -87,6 +89,16 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       return Right(userEntity);
     } catch (e) {
       return const Left('An error occurred');
+    }
+  }
+
+  @override
+  Future<Either<String, String>> resetPassword(String email) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      return const Right("Password reset link sent! Check your email.");
+    } on FirebaseAuthException catch (e) {
+      return Left(e.message ?? "Something went wrong");
     }
   }
 }

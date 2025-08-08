@@ -1,12 +1,9 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 class UserEntity {
+  String? fullName;
+  String? email;
+  String? imageURL;
+  String? password;
 
-  String ? fullName;
-  String ? email;
-  String ? imageURL;
-
-  UserEntity({
-    this.fullName,
-    this.email,
-    this.imageURL
-  });
+  UserEntity({this.fullName, this.email, this.imageURL, this.password});
 }

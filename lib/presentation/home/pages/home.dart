@@ -160,7 +160,10 @@ class _HomePageState extends State<HomePage>
                       ),
                     );
                   },
-                  icon: const Icon(Icons.person),
+                  icon: const Icon(
+                    Icons.add_circle_outline_sharp,
+                    color: Colors.green,
+                  ),
                 ),
                 title: SvgPicture.asset(AppVectors.logo, height: 40, width: 40),
               ),

@@ -35,13 +35,15 @@ class ProfilePage extends StatelessWidget {
         BlocProvider(create: (_) => FavoriteSongsCubit()..getFavoriteSongs()),
       ],
       child: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _profileInfo(context),
-            const SizedBox(height: 30),
-            _favoriteSongs(),
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _profileInfo(context),
+              const SizedBox(height: 30),
+              _favoriteSongs(),
+            ],
+          ),
         ),
       ),
     );
