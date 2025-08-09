@@ -27,6 +27,22 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  // ? AppBar(
+  // backgroundColor: Color(0xff2C2B2B),
+
+  //   title: Padding(
+  //     padding: EdgeInsets.only(left: 135),
+  //     child: Text('Profile', style: TextStyle(fontSize: 30)),
+  //   ),
+
+  //   actions: [
+  //     IconButton(
+  //       icon: Icon(Icons.logout),
+  //       onPressed: () => _logout(context),
+  //     ),
+  //   ],
+  // )
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -53,7 +69,7 @@ class ProfilePage extends StatelessWidget {
     return BlocProvider(
       create: (context) => ProfileInfoCubit()..getUser(),
       child: Container(
-        height: MediaQuery.of(context).size.height / 3.5,
+        height: MediaQuery.of(context).size.height / 2.5,
         width: double.infinity,
         decoration: BoxDecoration(
           color: context.isDarkMode ? const Color(0xff2C2B2B) : Colors.white,
@@ -75,6 +91,25 @@ class ProfilePage extends StatelessWidget {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: Text('Profile', style: TextStyle(fontSize: 30)),
+                      ),
+                      SizedBox(width: 50),
+                      IconButton(
+                        icon: Icon(
+                          Icons.logout,
+                          color:
+                              context.isDarkMode ? Colors.white : Colors.white,
+                        ),
+                        onPressed: () => _logout(context),
+                      ),
+                    ],
+                  ),
+
                   Container(
                     height: 90,
                     width: 90,

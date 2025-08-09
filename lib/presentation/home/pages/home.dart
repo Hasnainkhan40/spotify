@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage>
         child: Container(
           height: 70,
           decoration: BoxDecoration(
-            color: const Color(0xFF1C1C1E), // Background of the nav bar
+            color: const Color(0xFF1C1C1E),
             borderRadius: BorderRadius.circular(50),
           ),
           child: Row(
@@ -133,23 +133,8 @@ class _HomePageState extends State<HomePage>
         ),
       ),
       appBar:
-          _selectedIndex == 3
-              ? AppBar(
-                backgroundColor: Color(0xff2C2B2B),
-
-                title: Padding(
-                  padding: EdgeInsets.only(left: 135),
-                  child: Text('Profile', style: TextStyle(fontSize: 30)),
-                ),
-
-                actions: [
-                  IconButton(
-                    icon: Icon(Icons.logout),
-                    onPressed: () => _logout(context),
-                  ),
-                ],
-              )
-              : BasicAppbar(
+          _selectedIndex == 0
+              ? BasicAppbar(
                 hideBack: true,
                 action: IconButton(
                   onPressed: () {
@@ -166,7 +151,9 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
                 title: SvgPicture.asset(AppVectors.logo, height: 40, width: 40),
-              ),
+              )
+              : AppBar(),
+
       body:
           _selectedIndex == 0
               ? SingleChildScrollView(
@@ -191,7 +178,7 @@ class _HomePageState extends State<HomePage>
                   ],
                 ),
               )
-              : _pages[_selectedIndex], // Show player, profile, etc.
+              : _pages[_selectedIndex],
     );
   }
 
@@ -246,3 +233,19 @@ class _HomePageState extends State<HomePage>
     );
   }
 }
+  // ? AppBar(
+      //   backgroundColor: Color(0xff2C2B2B),
+
+      //   title: Padding(
+      //     padding: EdgeInsets.only(left: 135),
+      //     child: Text('Profile', style: TextStyle(fontSize: 30)),
+      //   ),
+
+      //   actions: [
+      //     IconButton(
+      //       icon: Icon(Icons.logout),
+      //       onPressed: () => _logout(context),
+      //     ),
+      //   ],
+      // )
+      
