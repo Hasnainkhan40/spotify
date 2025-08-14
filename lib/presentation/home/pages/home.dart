@@ -2,10 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hive/hive.dart';
 import 'package:spotify/common/helpers/is_dark_mode.dart';
 import 'package:spotify/core/configs/assets/app_images.dart';
 import 'package:spotify/core/configs/theme/app_colors.dart';
-import 'package:spotify/domain/entities/song/song.dart';
+import 'package:spotify/domain/entities/song/song_entity.dart';
 import 'package:spotify/presentation/auth/pages/signup.dart';
 import 'package:spotify/presentation/favoritesongs/favaritessong.dart';
 import 'package:spotify/presentation/home/widgets/news_songs.dart';
@@ -46,39 +47,34 @@ class _HomePageState extends State<HomePage>
     });
   }
 
+  final lastSong = Hive.box<SongEntity>('last_song').get('current');
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
 
-    final songEntity = SongEntity(
-      title: 'Sample Song',
-      artist: 'Sample Artist',
-      songUrl: 'https://example.com/sample.mp3',
-      imageUrl: 'https://example.com/sample.jpg',
-      duration: 3.21,
-      songId: "",
-      isFavorite: false,
-      releaseDate: Timestamp.now(),
-    );
+    final lastSong = Hive.box<SongEntity>('last_song').get('current');
 
-    // ✅ Initialize _pages *after* songEntity is created
     _pages = [
       const HomePage(),
-      SongPlayerPage(songEntity: songEntity),
+      SongPlayerPage(
+        songEntity:
+            lastSong ??
+            SongEntity(
+              title: 'Default Song',
+              artist: 'Unknown Artist',
+              imageUrl: '',
+              duration: 0,
+              songUrl: '',
+              isFavorite: false,
+              releaseDate: DateTime.now(),
+              songId: '',
+            ),
+      ),
       const Favaritessong(),
       const ProfilePage(),
     ];
-  }
-
-  void _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => SignupPage()),
-      (route) => false,
-    );
   }
 
   @override
@@ -152,8 +148,7 @@ class _HomePageState extends State<HomePage>
                 ),
                 title: SvgPicture.asset(AppVectors.logo, height: 40, width: 40),
               )
-              : AppBar(),
-
+              : null,
       body:
           _selectedIndex == 0
               ? SingleChildScrollView(
@@ -233,19 +228,3 @@ class _HomePageState extends State<HomePage>
     );
   }
 }
-  // ? AppBar(
-      //   backgroundColor: Color(0xff2C2B2B),
-
-      //   title: Padding(
-      //     padding: EdgeInsets.only(left: 135),
-      //     child: Text('Profile', style: TextStyle(fontSize: 30)),
-      //   ),
-
-      //   actions: [
-      //     IconButton(
-      //       icon: Icon(Icons.logout),
-      //       onPressed: () => _logout(context),
-      //     ),
-      //   ],
-      // )
-      

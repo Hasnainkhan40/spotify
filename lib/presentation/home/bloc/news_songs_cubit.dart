@@ -14,10 +14,10 @@ class NewsSongsCubit extends Cubit<NewsSongsState> {
 
     result.fold(
       (failure) {
-        emit(NewsSongsLoadFailure());
+        if (!isClosed) emit(NewsSongsLoadFailure());
       },
       (songs) {
-        emit(NewsSongsLoaded(songs: songs));
+        if (!isClosed) emit(NewsSongsLoaded(songs: songs));
       },
     );
   }

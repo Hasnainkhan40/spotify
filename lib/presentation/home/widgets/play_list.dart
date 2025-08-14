@@ -6,7 +6,7 @@ import 'package:spotify/core/configs/theme/app_colors.dart';
 import 'package:spotify/presentation/home/bloc/play_list_cubit.dart';
 import 'package:spotify/presentation/song_player/pages/song_player.dart';
 
-import '../../../domain/entities/song/song.dart';
+import '../../../domain/entities/song/song_entity.dart';
 import '../bloc/play_list_state.dart';
 
 class PlayList extends StatelessWidget {

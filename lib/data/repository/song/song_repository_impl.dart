@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:spotify/data/sources/song/song_firebase_service.dart';
+import 'package:spotify/domain/entities/song/song_entity.dart';
 import 'package:spotify/domain/repository/song/song.dart';
 
 import '../../../service_locator.dart';
@@ -28,5 +29,10 @@ class SongRepositoryImpl extends SongsRepository {
   @override
   Future<Either> getUserFavoriteSongs() async {
     return await sl<SongFirebaseService>().getUserFavoriteSongs();
+  }
+
+  @override
+  Future<Either<String, void>> storeSong(SongEntity song) async {
+    return await sl<SongFirebaseService>().storeSong(song);
   }
 }

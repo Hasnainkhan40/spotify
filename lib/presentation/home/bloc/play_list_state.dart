@@ -1,6 +1,6 @@
-import 'package:spotify/domain/entities/song/song.dart';
+import 'package:spotify/domain/entities/song/song_entity.dart';
 
-import 'package:spotify/domain/entities/song/song.dart';
+import 'package:spotify/domain/entities/song/song_entity.dart';
 
 abstract class PlayListState {}
 

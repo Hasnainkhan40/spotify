@@ -27,12 +27,12 @@ Widget _favoriteSongs() {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'FAVORITE SONGS',
-            style: TextStyle(fontWeight: FontWeight.bold),
+          Padding(
+            padding: const EdgeInsets.only(top: 30, left: 100),
+            child: const Text('FAVORITE SONGS', style: TextStyle(fontSize: 20)),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 15),
           BlocBuilder<FavoriteSongsCubit, FavoriteSongsState>(
             builder: (context, state) {
               if (state is FavoriteSongsLoading) {

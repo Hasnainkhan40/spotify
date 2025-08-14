@@ -10,8 +10,9 @@ import 'package:spotify/domain/usecases/song/get_favorite_songs.dart';
 import 'package:spotify/domain/usecases/song/get_news_songs.dart';
 import 'package:spotify/domain/usecases/song/get_play_list.dart';
 import 'package:spotify/domain/usecases/song/is_favorite_song.dart';
+import 'package:spotify/domain/usecases/song/store_song.dart';
+import 'package:spotify/presentation/addSongs/bloc/addsong_bloc.dart';
 import 'package:spotify/presentation/forget_pas.dart/bloc/auth_bloc.dart';
-
 import 'data/repository/song/song_repository_impl.dart';
 import 'data/sources/song/song_firebase_service.dart';
 import 'domain/repository/song/song.dart';
@@ -24,18 +25,23 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<AuthFirebaseService>(AuthFirebaseServiceImpl());
 
   sl.registerSingleton<SongFirebaseService>(SongFirebaseServiceImpl());
+
   // Repositories
   sl.registerSingleton<AuthRepository>(AuthRepositoryImpl());
 
   sl.registerSingleton<SongsRepository>(SongRepositoryImpl());
 
+  // Auth use cases
   sl.registerSingleton<ResetPasswordUseCase>(
     ResetPasswordUseCase(sl<AuthRepository>()),
   );
-  // Auth use cases
+
   sl.registerSingleton<SignupUseCase>(SignupUseCase());
 
   sl.registerSingleton<SigninUseCase>(SigninUseCase());
+
+  sl.registerSingleton<GetUserUseCase>(GetUserUseCase());
+
   // Song use cases
   sl.registerSingleton<GetNewsSongsUseCase>(GetNewsSongsUseCase());
 
@@ -47,12 +53,16 @@ Future<void> initializeDependencies() async {
 
   sl.registerSingleton<IsFavoriteSongUseCase>(IsFavoriteSongUseCase());
 
-  sl.registerSingleton<GetUserUseCase>(GetUserUseCase());
-
   sl.registerSingleton<GetFavoriteSongsUseCase>(GetFavoriteSongsUseCase());
+
+  sl.registerLazySingleton(() => StoreSongUseCase(sl<SongsRepository>()));
 
   // Blocs
   sl.registerFactory<AuthBloc>(
     () => AuthBloc(resetPasswordUseCase: sl<ResetPasswordUseCase>()),
+  );
+
+  sl.registerFactory<StoreSongBloc>(
+    () => StoreSongBloc(storeSongUseCase: sl<StoreSongUseCase>()),
   );
 }

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:spotify/data/models/song/song.dart';
-import 'package:spotify/domain/entities/song/song.dart';
+import 'package:spotify/domain/entities/song/song_entity.dart';
 import 'package:spotify/domain/usecases/song/is_favorite_song.dart';
 import 'package:spotify/domain/usecases/song/is_favorite_song.dart';
 
@@ -14,6 +14,7 @@ abstract class SongFirebaseService {
   Future<Either> addOrRemoveFavoriteSong(String songId);
   Future<bool> isFavoriteSong(String songId);
   Future<Either> getUserFavoriteSongs();
+  Future<Either<String, void>> storeSong(SongEntity song);
 }
 
 class SongFirebaseServiceImpl extends SongFirebaseService {
@@ -51,6 +52,23 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
     } catch (e) {
       print('Error in getNewsSongs(): $e');
       return const Left('An error occurred, Please try again.');
+    }
+  }
+
+  @override
+  Future<Either<String, void>> storeSong(SongEntity song) async {
+    try {
+      final model = SongModel.fromEntity(song);
+
+      final docRef = await FirebaseFirestore.instance
+          .collection('songs')
+          .add(model.toJson());
+
+      await docRef.update({'songId': docRef.id});
+
+      return const Right(null);
+    } catch (e) {
+      return Left('Error storing song: $e');
     }
   }
 

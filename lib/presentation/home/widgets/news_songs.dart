@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 import 'package:spotify/common/helpers/is_dark_mode.dart';
 // import 'package:spotify/core/configs/constants/app_urls.dart';
 import 'package:spotify/core/configs/theme/app_colors.dart';
-import 'package:spotify/domain/entities/song/song.dart';
+import 'package:spotify/domain/entities/song/song_entity.dart';
 import 'package:spotify/presentation/home/bloc/news_songs_cubit.dart';
 import 'package:spotify/presentation/song_player/pages/song_player.dart';
 // import 'package:spotify/presentation/song_player/pages/song_player.dart';
@@ -30,7 +31,7 @@ class NewsSongs extends StatelessWidget {
             }
 
             if (state is NewsSongsLoaded) {
-              return _songs(state.songs);
+              return songs(state.songs);
             }
 
             return Icon(Icons.error);
@@ -40,13 +41,17 @@ class NewsSongs extends StatelessWidget {
     );
   }
 
-  Widget _songs(List<SongEntity> songs) {
+  Widget songs(List<SongEntity> songs) {
     return ListView.separated(
       scrollDirection: Axis.horizontal,
       shrinkWrap: true,
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
+            final song = songs[index];
+
+            // Save the song to Hive
+            Hive.box<SongEntity>('last_song').put('current', song);
             Navigator.push(
               context,
               MaterialPageRoute(

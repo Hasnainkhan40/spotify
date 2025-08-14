@@ -2,8 +2,6 @@ abstract class SongPlayerState {}
 
 class SongPlayerLoading extends SongPlayerState {}
 
-class SongPlayerFailure extends SongPlayerState {}
-
 class SongPlayerLoaded extends SongPlayerState {
   final String songUrl;
   final Duration position;
@@ -30,6 +28,11 @@ class SongPlayerLoaded extends SongPlayerState {
       isPlaying: isPlaying ?? this.isPlaying,
     );
   }
+}
+
+class SongPlayerError extends SongPlayerState {
+  final String message;
+  SongPlayerError(this.message);
 }
 
 

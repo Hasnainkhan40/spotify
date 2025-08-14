@@ -8,6 +8,8 @@ import 'package:spotify/presentation/auth/pages/signup.dart';
 import 'package:spotify/presentation/profile/bloc/favorite_songs_cubit.dart';
 import 'package:spotify/presentation/profile/bloc/favorite_songs_state.dart';
 import 'package:spotify/presentation/profile/bloc/profile_info_cubit.dart';
+import 'package:spotify/presentation/addSongs/pages/add_songs.dart';
+import 'package:spotify/presentation/profile/widgets/FancyFAB.dart';
 import 'package:spotify/presentation/song_player/pages/song_player.dart';
 
 import '../../../common/widgets/favorite_button/favorite_button.dart';
@@ -27,22 +29,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // ? AppBar(
-  // backgroundColor: Color(0xff2C2B2B),
-
-  //   title: Padding(
-  //     padding: EdgeInsets.only(left: 135),
-  //     child: Text('Profile', style: TextStyle(fontSize: 30)),
-  //   ),
-
-  //   actions: [
-  //     IconButton(
-  //       icon: Icon(Icons.logout),
-  //       onPressed: () => _logout(context),
-  //     ),
-  //   ],
-  // )
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -51,11 +37,37 @@ class ProfilePage extends StatelessWidget {
         BlocProvider(create: (_) => FavoriteSongsCubit()..getFavoriteSongs()),
       ],
       child: Scaffold(
+        // appBar: AppBar(
+        //   backgroundColor: Color(0xff2C2B2B),
+
+        // title: Padding(
+        //   padding: EdgeInsets.only(left: 135),
+        //   child: Text('Profile', style: TextStyle(fontSize: 30)),
+        // ),
+
+        //   actions: [
+        //     IconButton(
+        //       icon: Icon(Icons.logout),
+        //       onPressed: () => _logout(context),
+        //     ),
+        //   ],
+        // ),
+        floatingActionButton: FancyFAB(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (BuildContext context) => AddSongs()),
+            );
+          },
+        ),
         body: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _profileInfo(context),
+              Align(
+                alignment: Alignment.topCenter,
+                child: _profileInfo(context),
+              ),
               const SizedBox(height: 30),
               _favoriteSongs(),
             ],
@@ -89,26 +101,42 @@ class ProfilePage extends StatelessWidget {
 
             if (state is ProfileInfoLoaded) {
               return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: Text('Profile', style: TextStyle(fontSize: 30)),
-                      ),
-                      SizedBox(width: 50),
-                      IconButton(
-                        icon: Icon(
-                          Icons.logout,
-                          color:
-                              context.isDarkMode ? Colors.white : Colors.white,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 25),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(left: 150),
+                          child: Text(
+                            'Profile',
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                         ),
-                        onPressed: () => _logout(context),
-                      ),
-                    ],
+
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.logout,
+                              color:
+                                  context.isDarkMode
+                                      ? Colors.white
+                                      : Colors.white,
+                            ),
+                            onPressed: () => _logout(context),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+
+                  SizedBox(height: 30),
 
                   Container(
                     height: 90,
