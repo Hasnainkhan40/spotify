@@ -25,13 +25,13 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
     super.initState();
     _playerCubit = SongPlayerCubit();
 
-    // ✅ Load the song from parameter
+    // Load the song from parameter
     _playerCubit.loadSong(widget.songEntity);
 
-    // ✅ Save last played song to Hive
+    //  Save last played song to Hive
     // _playerCubit.saveLastSong(widget.songEntity);
 
-    // ✅ Also load last played song (optional, if restoring)
+    //  Also load last played song (optional, if restoring)
     _playerCubit.loadLastPlayedSong();
   }
 

@@ -15,6 +15,7 @@ abstract class SongFirebaseService {
   Future<bool> isFavoriteSong(String songId);
   Future<Either> getUserFavoriteSongs();
   Future<Either<String, void>> storeSong(SongEntity song);
+  Future<Either<String, List<SongEntity>>> searchSongs(String query);
 }
 
 class SongFirebaseServiceImpl extends SongFirebaseService {
@@ -190,6 +191,56 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
     } catch (e) {
       print(e);
       return const Left('An error occurred');
+    }
+  }
+
+  //search
+  @override
+  Future<Either<String, List<SongEntity>>> searchSongs(String query) async {
+    try {
+      if (query.trim().isEmpty) {
+        return const Right([]); // return empty list for empty query
+      }
+
+      // Normalize query for case-insensitive search
+      String normalizedQuery = query.toLowerCase();
+
+      final songsCollection = FirebaseFirestore.instance.collection('songs');
+
+      // 🔎 Fetch all songs once
+      final snapshot =
+          await songsCollection
+              .where('title', isGreaterThanOrEqualTo: normalizedQuery)
+              .where('title', isLessThanOrEqualTo: '$normalizedQuery\uf8ff')
+              .get();
+
+      // Filter songs first
+      List<SongModel> matchedSongs = [];
+      for (var doc in snapshot.docs) {
+        final songModel = SongModel.fromJson(doc.data());
+        songModel.songId = doc.id;
+
+        if (songModel.title?.toLowerCase().contains(normalizedQuery) == true ||
+            songModel.artist?.toLowerCase().contains(normalizedQuery) == true) {
+          matchedSongs.add(songModel);
+        }
+      }
+
+      // ✅ Run favorite checks in parallel using Future.wait
+      final results = await Future.wait(
+        matchedSongs.map((songModel) async {
+          bool isFavorite = await sl<IsFavoriteSongUseCase>().call(
+            params: songModel.songId,
+          );
+          songModel.isFavorite = isFavorite;
+          return songModel.toEntity();
+        }),
+      );
+
+      return Right(results);
+    } catch (e) {
+      print("Error in searchSongs(): $e");
+      return Left("Error while searching songs: $e");
     }
   }
 }

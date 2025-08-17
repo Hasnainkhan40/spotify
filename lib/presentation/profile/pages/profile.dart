@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:spotify/common/helpers/is_dark_mode.dart';
 import 'package:spotify/common/widgets/appbar/app_bar.dart';
+import 'package:spotify/domain/usecases/auth/get_user.dart';
 import 'package:spotify/presentation/auth/pages/signup.dart';
 import 'package:spotify/presentation/profile/bloc/favorite_songs_cubit.dart';
 import 'package:spotify/presentation/profile/bloc/favorite_songs_state.dart';
@@ -11,14 +15,20 @@ import 'package:spotify/presentation/profile/bloc/profile_info_cubit.dart';
 import 'package:spotify/presentation/addSongs/pages/add_songs.dart';
 import 'package:spotify/presentation/profile/widgets/FancyFAB.dart';
 import 'package:spotify/presentation/song_player/pages/song_player.dart';
+import 'package:spotify/service_locator.dart';
 
 import '../../../common/widgets/favorite_button/favorite_button.dart';
 
 import '../bloc/profile_info_state.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
 
@@ -33,22 +43,37 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => ProfileInfoCubit()..getUser()),
+        BlocProvider(
+          create:
+              (_) =>
+                  ProfileInfoCubit(getUserUseCase: sl<GetUserUseCase>())
+                    ..getUser(),
+        ),
+
         BlocProvider(create: (_) => FavoriteSongsCubit()..getFavoriteSongs()),
       ],
       child: Scaffold(
         // appBar: AppBar(
         //   backgroundColor: Color(0xff2C2B2B),
 
-        // title: Padding(
-        //   padding: EdgeInsets.only(left: 135),
-        //   child: Text('Profile', style: TextStyle(fontSize: 30)),
-        // ),
+        //   title: Padding(
+        //     padding: EdgeInsets.only(left: 150),
+        //     child: Text(
+        //       'Profile',
+        //       style: TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+        //     ),
+        //   ),
 
         //   actions: [
-        //     IconButton(
-        //       icon: Icon(Icons.logout),
-        //       onPressed: () => _logout(context),
+        //     Align(
+        //       alignment: Alignment.centerRight,
+        //       child: IconButton(
+        //         icon: Icon(
+        //           Icons.logout,
+        //           color: context.isDarkMode ? Colors.white : Colors.white,
+        //         ),
+        //         onPressed: () => _logout(context),
+        //       ),
         //     ),
         //   ],
         // ),
@@ -62,7 +87,6 @@ class ProfilePage extends StatelessWidget {
         ),
         body: SingleChildScrollView(
           child: Column(
-            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Align(
                 alignment: Alignment.topCenter,
@@ -77,9 +101,10 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  // Widget _profileInfo(BuildContext context) {
   Widget _profileInfo(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProfileInfoCubit()..getUser(),
+      create: (_) => sl<ProfileInfoCubit>()..getUser(),
       child: Container(
         height: MediaQuery.of(context).size.height / 2.5,
         width: double.infinity,
@@ -144,7 +169,10 @@ class ProfilePage extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                        image: NetworkImage(state.userEntity.imageURL!),
+                        image: NetworkImage(
+                          "https://res.cloudinary.com/dmsal1h1j/image/upload/v1754476174/Rectangle_29_lx8riq.png",
+                        ),
+                        //  image: NetworkImage(state.userEntity.imageURL!),
                       ),
                     ),
                   ),

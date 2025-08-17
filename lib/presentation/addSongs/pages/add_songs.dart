@@ -12,6 +12,7 @@ import 'package:spotify/domain/entities/song/song_entity.dart';
 import 'package:spotify/presentation/addSongs/bloc/addsong_bloc.dart';
 import 'package:spotify/presentation/addSongs/bloc/addsong_event.dart';
 import 'package:spotify/presentation/addSongs/bloc/addsong_state.dart';
+import 'package:spotify/service/cloudinary_service.dart';
 import 'package:uuid/uuid.dart';
 
 class AddSongs extends StatefulWidget {
@@ -68,7 +69,7 @@ class _AddSongsState extends State<AddSongs> {
     }
   }
 
-  void _saveSong() {
+  void _saveSong() async {
     final title = titleController.text.trim();
     final artist = artistController.text.trim();
     final releaseDateText = releaseDateController.text.trim();
@@ -77,13 +78,14 @@ class _AddSongsState extends State<AddSongs> {
         artist.isEmpty ||
         _selectedSongPath == null ||
         releaseDateText.isEmpty ||
-        _calculatedDuration == null) {
+        _calculatedDuration == null ||
+        _selectedImage == null) {
       showDialog(
         context: context,
         builder:
             (_) => const AlertDialog(
               content: Text(
-                "Please fill all the fields and select a song file",
+                "Please fill all the fields and select image & song file",
               ),
             ),
       );
@@ -94,22 +96,97 @@ class _AddSongsState extends State<AddSongs> {
     try {
       parsedReleaseDate = DateTime.parse(releaseDateText);
     } catch (_) {
-      parsedReleaseDate = DateTime.now();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Invalid release date format")),
+      );
+      return;
     }
 
-    final song = SongEntity(
-      title: title,
-      artist: artist,
-      imageUrl: _selectedImage?.path ?? '',
-      duration: _calculatedDuration!,
-      releaseDate: parsedReleaseDate,
-      isFavorite: false,
-      songId: const Uuid().v4(),
-      songUrl: '', // Upload later
-    );
+    try {
+      // Show loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
+      );
 
-    context.read<StoreSongBloc>().add(StoreSongRequested(song));
+      // Upload image
+      final imageUrl = await uploadFileToCloudinary(
+        _selectedImage!,
+        "song_images",
+      );
+
+      // Upload song file
+      final songFile = File(_selectedSongPath!);
+      final songUrl = await uploadFileToCloudinary(songFile, "songs");
+
+      // Close loading dialog safely
+      if (Navigator.canPop(context)) Navigator.of(context).pop();
+
+      // Create SongEntity
+      final song = SongEntity(
+        title: title,
+        artist: artist,
+        imageUrl: imageUrl,
+        duration: _calculatedDuration!,
+        releaseDate: parsedReleaseDate,
+        isFavorite: false,
+        songId: const Uuid().v4(),
+        songUrl: songUrl,
+      );
+
+      // Save to Firestore through Bloc
+      context.read<StoreSongBloc>().add(StoreSongRequested(song));
+    } catch (e) {
+      if (Navigator.canPop(context)) Navigator.of(context).pop();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Upload failed: ${e.toString()}")));
+    }
   }
+
+  // void _saveSong() {
+  //   final title = titleController.text.trim();
+  //   final artist = artistController.text.trim();
+  //   final releaseDateText = releaseDateController.text.trim();
+
+  //   if (title.isEmpty ||
+  //       artist.isEmpty ||
+  //       _selectedSongPath == null ||
+  //       releaseDateText.isEmpty ||
+  //       _calculatedDuration == null) {
+  //     showDialog(
+  //       context: context,
+  //       builder:
+  //           (_) => const AlertDialog(
+  //             content: Text(
+  //               "Please fill all the fields and select a song file",
+  //             ),
+  //           ),
+  //     );
+  //     return;
+  //   }
+
+  //   DateTime parsedReleaseDate;
+  //   try {
+  //     parsedReleaseDate = DateTime.parse(releaseDateText);
+  //   } catch (_) {
+  //     parsedReleaseDate = DateTime.now();
+  //   }
+
+  //   final song = SongEntity(
+  //     title: title,
+  //     artist: artist,
+  //     imageUrl: _selectedImage?.path ?? '',
+  //     duration: _calculatedDuration!,
+  //     releaseDate: parsedReleaseDate,
+  //     isFavorite: false,
+  //     songId: const Uuid().v4(),
+  //     songUrl: '', // Upload later
+  //   );
+
+  //   context.read<StoreSongBloc>().add(StoreSongRequested(song));
+  // }
 
   @override
   Widget build(BuildContext context) {

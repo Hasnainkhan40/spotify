@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotify/common/helpers/is_dark_mode.dart';
+import 'package:spotify/presentation/home/pages/home.dart';
 
 class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? title;
@@ -21,13 +22,17 @@ class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       centerTitle: true,
       title: title ?? const Text(''),
-      actions: [],
+      actions: action != null ? [action!] : [],
       leading:
           hideBack
               ? null
               : IconButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  //Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HomePage()),
+                  );
                 },
                 icon: Container(
                   height: 50,

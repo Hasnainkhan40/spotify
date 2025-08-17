@@ -35,4 +35,9 @@ class SongRepositoryImpl extends SongsRepository {
   Future<Either<String, void>> storeSong(SongEntity song) async {
     return await sl<SongFirebaseService>().storeSong(song);
   }
+
+  @override
+  Future<Either<String, List<SongEntity>>> searchSongs(String query) async {
+    return await sl<SongFirebaseService>().searchSongs(query);
+  }
 }

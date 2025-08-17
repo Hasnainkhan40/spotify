@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive/hive.dart';
@@ -7,12 +5,12 @@ import 'package:spotify/common/helpers/is_dark_mode.dart';
 import 'package:spotify/core/configs/assets/app_images.dart';
 import 'package:spotify/core/configs/theme/app_colors.dart';
 import 'package:spotify/domain/entities/song/song_entity.dart';
-import 'package:spotify/presentation/auth/pages/signup.dart';
 import 'package:spotify/presentation/favoritesongs/favaritessong.dart';
 import 'package:spotify/presentation/home/widgets/news_songs.dart';
 import 'package:spotify/presentation/home/widgets/play_list.dart';
 import 'package:spotify/presentation/profile/pages/profile.dart';
 import 'package:spotify/presentation/song_player/pages/song_player.dart';
+import 'package:spotify/presentation/searchScreen/pages/searchScreen.dart';
 // import 'package:spotify/presentation/profile/pages/profile.dart';
 
 import '../../../common/widgets/appbar/app_bar.dart';
@@ -57,7 +55,7 @@ class _HomePageState extends State<HomePage>
     final lastSong = Hive.box<SongEntity>('last_song').get('current');
 
     _pages = [
-      const HomePage(),
+      HomePage(),
       SongPlayerPage(
         songEntity:
             lastSong ??
@@ -133,18 +131,15 @@ class _HomePageState extends State<HomePage>
               ? BasicAppbar(
                 hideBack: true,
                 action: IconButton(
+                  icon: const Icon(Icons.search_rounded, color: Colors.green),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (BuildContext context) => const ProfilePage(),
+                        builder: (BuildContext context) => const SearchPage(),
                       ),
                     );
                   },
-                  icon: const Icon(
-                    Icons.add_circle_outline_sharp,
-                    color: Colors.green,
-                  ),
                 ),
                 title: SvgPicture.asset(AppVectors.logo, height: 40, width: 40),
               )
@@ -153,10 +148,14 @@ class _HomePageState extends State<HomePage>
           _selectedIndex == 0
               ? SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+
                   children: [
                     _homeTopCard(),
+                    SizedBox(height: 40),
                     _tabs(),
+                    SizedBox(height: 25),
+                    Divider(),
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.3,
                       child: TabBarView(
@@ -204,9 +203,13 @@ class _HomePageState extends State<HomePage>
     return TabBar(
       controller: _tabController,
       isScrollable: true,
+      tabAlignment: TabAlignment.center,
       labelColor: context.isDarkMode ? Colors.white : Colors.black,
       indicatorColor: AppColors.primary,
-      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+      padding: EdgeInsets.zero,
+      labelPadding: const EdgeInsets.symmetric(horizontal: 16),
+      indicatorSize: TabBarIndicatorSize.label,
+      dividerColor: Colors.transparent,
       tabs: const [
         Text(
           'News',
@@ -227,4 +230,32 @@ class _HomePageState extends State<HomePage>
       ],
     );
   }
+
+  // Widget _tabs() {
+  //   return TabBar(
+  //     controller: _tabController,
+  //     isScrollable: true,
+  //     labelColor: context.isDarkMode ? Colors.white : Colors.black,
+  //     indicatorColor: AppColors.primary,
+  //     padding: const EdgeInsets.symmetric(vertical: 40),
+  //     tabs: const [
+  //       Text(
+  //         'News',
+  //         style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+  //       ),
+  //       Text(
+  //         'Videos',
+  //         style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+  //       ),
+  //       Text(
+  //         'Artists',
+  //         style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+  //       ),
+  //       Text(
+  //         'Podcasts',
+  //         style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+  //       ),
+  //     ],
+  //   );
+  // }
 }
