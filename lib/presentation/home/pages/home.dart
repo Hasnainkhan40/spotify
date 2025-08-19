@@ -69,6 +69,7 @@ class _HomePageState extends State<HomePage>
               releaseDate: DateTime.now(),
               songId: '',
             ),
+        playlist: [],
       ),
       const Favaritessong(),
       const ProfilePage(),

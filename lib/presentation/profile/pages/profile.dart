@@ -228,6 +228,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               builder:
                                   (BuildContext context) => SongPlayerPage(
                                     songEntity: state.favoriteSongs[index],
+                                    playlist: [],
                                   ),
                             ),
                           );

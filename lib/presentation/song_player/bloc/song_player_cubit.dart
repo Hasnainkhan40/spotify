@@ -74,6 +74,8 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
           duration: _songDuration,
           isPlaying: _audioPlayer.playing,
           songUrl: _currentUrl,
+          loopMode: _audioPlayer.loopMode, // ✅ real value from player
+          isShuffleEnabled: _audioPlayer.shuffleModeEnabled, // also required
         ),
       );
     } catch (e) {
@@ -110,10 +112,12 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
 
         emit(
           SongPlayerLoaded(
-            position: Duration.zero,
+            position: _songPosition,
             duration: _songDuration,
-            isPlaying: false,
+            isPlaying: _audioPlayer.playing,
             songUrl: _currentUrl,
+            loopMode: _audioPlayer.loopMode,
+            isShuffleEnabled: _audioPlayer.shuffleModeEnabled,
           ),
         );
       } catch (e) {
@@ -135,15 +139,29 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
     // No need to call updateSongPlayer here, it will be triggered by playingStream listener
   }
 
+  // void updateSongPlayer() {
+  //   emit(
+  //     SongPlayerLoaded(
+  //       position: _songPosition,
+  //       duration: _songDuration,
+  //       isPlaying: _audioPlayer.playing,
+  //       songUrl: _currentUrl,
+  //     ),
+  //   );
+  // }
+
   void updateSongPlayer() {
-    emit(
-      SongPlayerLoaded(
-        position: _songPosition,
-        duration: _songDuration,
-        isPlaying: _audioPlayer.playing,
-        songUrl: _currentUrl,
-      ),
+    final newState = SongPlayerLoaded(
+      position: _songPosition,
+      duration: _songDuration,
+      isPlaying: _audioPlayer.playing,
+      songUrl: _currentUrl,
+      loopMode: _audioPlayer.loopMode,
+      isShuffleEnabled: _audioPlayer.shuffleModeEnabled,
     );
+    if (state != newState) {
+      emit(newState);
+    }
   }
 
   @override
@@ -154,6 +172,48 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
 
   void seekTo(Duration position) {
     _audioPlayer.seek(position);
+  }
+
+  //THIS IS THE EXTRA
+  int _currentIndex = 0;
+  List<SongEntity> _playlist = [];
+
+  // Load entire playlist
+  void loadPlaylist(List<SongEntity> songs, {int startIndex = 0}) {
+    _playlist = songs;
+    _currentIndex = startIndex;
+    loadSong(_playlist[_currentIndex]);
+  }
+
+  // Play next track
+  void playNext() {
+    if (_currentIndex < _playlist.length - 1) {
+      _currentIndex++;
+      loadSong(_playlist[_currentIndex]);
+    }
+  }
+
+  // Play previous track
+  void playPrevious() {
+    if (_currentIndex > 0) {
+      _currentIndex--;
+      loadSong(_playlist[_currentIndex]);
+    }
+  }
+
+  // Toggle loop mode (repeat one/off)
+  void toggleLoopMode() {
+    final newMode =
+        _audioPlayer.loopMode == LoopMode.off ? LoopMode.one : LoopMode.off;
+    _audioPlayer.setLoopMode(newMode);
+    updateSongPlayer();
+  }
+
+  // Toggle shuffle on/off
+  Future<void> toggleShuffle() async {
+    final isEnabled = _audioPlayer.shuffleModeEnabled;
+    await _audioPlayer.setShuffleModeEnabled(!isEnabled);
+    updateSongPlayer();
   }
 }
 
