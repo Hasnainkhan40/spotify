@@ -56,8 +56,11 @@ class NewsSongs extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder:
-                    (BuildContext context) =>
-                        SongPlayerPage(songEntity: songs[index], playlist: []),
+                    (BuildContext context) => SongPlayerPage(
+                      songEntity: songs[index], // tapped song
+                      playlist: songs, // full playlist
+                      startIndex: index, // start at this song
+                    ),
               ),
             );
           },

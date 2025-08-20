@@ -39,6 +39,7 @@ Future<void> main() async {
 
   Hive.registerAdapter(SongEntityAdapter());
 
+  await Hive.openBox('favorites');
   await Hive.openBox<SongEntity>('last_song');
 
   runApp(const MyApp());

@@ -50,7 +50,6 @@ Widget _favoriteSongs() {
                             builder:
                                 (BuildContext context) => SongPlayerPage(
                                   songEntity: state.favoriteSongs[index],
-                                  playlist: [],
                                 ),
                           ),
                         );
