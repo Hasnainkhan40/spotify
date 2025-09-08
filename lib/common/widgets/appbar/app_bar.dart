@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotify/common/helpers/is_dark_mode.dart';
-import 'package:spotify/presentation/home/pages/home.dart';
+import 'package:spotify/presentation/home/pages/homescreen.dart';
 
 class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? title;

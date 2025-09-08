@@ -53,7 +53,9 @@ dependencies:
   cloudinary_public: ^0.12.0
   http: ^0.13.6
   file_picker:
+  intl: ^0.18.0
   path: ^1.8.3
+  flutter_dotenv: ^5.0.2
 
 
 dev_dependencies:
@@ -86,6 +88,7 @@ flutter:
     - assets/fonts/
     - assets/images/
     - assets/vectors/
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

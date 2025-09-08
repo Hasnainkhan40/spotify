@@ -9,12 +9,16 @@ import 'package:spotify/core/configs/theme/app_theme.dart';
 import 'package:spotify/domain/entities/song/song_entity.dart';
 import 'package:spotify/firebase_options.dart';
 import 'package:spotify/presentation/addSongs/bloc/addsong_bloc.dart';
+import 'package:spotify/presentation/chatAi/bloc/chat_bloc.dart';
+import 'package:spotify/presentation/chatAi/chat_screen.dart';
 import 'package:spotify/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:spotify/presentation/forget_pas.dart/bloc/auth_bloc.dart';
 import 'package:spotify/presentation/song_player/bloc/song_player_cubit.dart';
 import 'package:spotify/presentation/splash/pages/splash.dart';
 import 'package:spotify/presentation/searchScreen/cubit/search_cubit.dart';
 import 'package:spotify/service_locator.dart';
+import 'service_locator.dart' as di;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +45,15 @@ Future<void> main() async {
 
   await Hive.openBox('favorites');
   await Hive.openBox<SongEntity>('last_song');
+  await dotenv.load(fileName: ".env");
+  final hfApiKey = dotenv.env['HF_API_KEY'] ?? '';
+  await di.initInjection(hfApiKey: hfApiKey, modelId: 'gpt2');
+  // Provide your Hugging Face API key here (or load from secure storage / remote config).
+  // const hfApiKey = String.fromEnvironment(
+  //   'HF_API_KEY',
+  //   defaultValue: '<PUT_YOUR_KEY_HERE>',
+  // );
+  // or load from some secure source; do not hardcode in production.
 
   runApp(const MyApp());
 }
@@ -54,6 +67,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider(create: (_) => sl<AuthBloc>()),
+        BlocProvider(create: (_) => sl<ChatBloc>()), // provide globally
         BlocProvider(create: (_) => SongPlayerCubit()),
         BlocProvider<StoreSongBloc>(create: (_) => sl<StoreSongBloc>()),
       ],

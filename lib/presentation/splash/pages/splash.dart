@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:spotify/core/configs/assets/app_vectors.dart';
-import 'package:spotify/presentation/home/pages/home.dart';
+import 'package:spotify/presentation/home/pages/homescreen.dart';
 import 'package:spotify/presentation/intro/pages/get_started.dart'; // Optional: use if needed
 import 'package:spotify/presentation/auth/pages/signin.dart';
 import 'package:spotify/presentation/song_player/bloc/song_player_cubit.dart';

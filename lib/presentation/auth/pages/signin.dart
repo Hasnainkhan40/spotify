@@ -9,7 +9,7 @@ import 'package:spotify/presentation/forget_pas.dart/ForgotPasswordPage.dart';
 
 import '../../../domain/usecases/auth/sigin.dart';
 import '../../../service_locator.dart';
-import '../../home/pages/home.dart';
+import '../../home/pages/homescreen.dart';
 
 class SigninPage extends StatelessWidget {
   SigninPage({super.key});

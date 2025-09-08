@@ -1,10 +1,14 @@
 import 'package:get_it/get_it.dart';
 import 'package:spotify/data/repository/auth/auth_repository_impl.dart';
+import 'package:spotify/data/repository/chat_repository_impl.dart';
 import 'package:spotify/data/sources/auth/auth_firebase_service.dart';
+import 'package:spotify/data/sources/hf_BaEvaSDwpbfTziykKpDWDjepfhORiBzrHSinference_datasource.dart';
 import 'package:spotify/domain/repository/auth/auth.dart';
+import 'package:spotify/domain/repository/chat_repository.dart';
 import 'package:spotify/domain/usecases/auth/get_user.dart';
 import 'package:spotify/domain/usecases/auth/signup.dart';
 import 'package:spotify/domain/usecases/auth/update_pass.dart';
+import 'package:spotify/domain/usecases/send_message_usecase.dart';
 import 'package:spotify/domain/usecases/song/add_or_remove_favorite_song.dart';
 import 'package:spotify/domain/usecases/song/get_favorite_songs.dart';
 import 'package:spotify/domain/usecases/song/get_news_songs.dart';
@@ -13,6 +17,7 @@ import 'package:spotify/domain/usecases/song/is_favorite_song.dart';
 import 'package:spotify/domain/usecases/song/search_song_usecase.dart';
 import 'package:spotify/domain/usecases/song/store_song.dart';
 import 'package:spotify/presentation/addSongs/bloc/addsong_bloc.dart';
+import 'package:spotify/presentation/chatAi/bloc/chat_bloc.dart';
 import 'package:spotify/presentation/forget_pas.dart/bloc/auth_bloc.dart';
 import 'package:spotify/presentation/profile/bloc/profile_info_cubit.dart';
 import 'package:spotify/presentation/searchScreen/cubit/search_cubit.dart';
@@ -20,8 +25,34 @@ import 'data/repository/song/song_repository_impl.dart';
 import 'data/sources/song/song_firebase_service.dart';
 import 'domain/repository/song/song.dart';
 import 'domain/usecases/auth/sigin.dart';
+import 'package:http/http.dart' as http; // ✅ t
 
 final sl = GetIt.instance;
+
+Future<void> initInjection({
+  required String hfApiKey,
+  String modelId = 'gpt2',
+}) async {
+  // External
+  sl.registerLazySingleton<http.Client>(() => http.Client());
+
+  // Data source
+  sl.registerLazySingleton<HuggingFaceInferenceDataSource>(
+    () => HuggingFaceInferenceDataSource(apiKey: hfApiKey, client: sl()),
+  );
+
+  // Repository
+  // Register repository
+  sl.registerLazySingleton<ChatRepository>(
+    // 👈 register as interface
+    () => ChatRepositoryImpl(dataSource: sl(), modelId: modelId),
+  );
+  // UseCase
+  sl.registerLazySingleton(() => SendMessageUseCase(sl()));
+
+  // Bloc - register factory so new instance can be created per-screen if needed
+  sl.registerFactory(() => ChatBloc(sendMessageUseCase: sl()));
+}
 
 Future<void> initializeDependencies() async {
   // Services

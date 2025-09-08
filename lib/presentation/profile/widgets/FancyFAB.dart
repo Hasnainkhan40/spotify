@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 
 class FancyFAB extends StatefulWidget {
   final VoidCallback onPressed;
-  const FancyFAB({required this.onPressed, super.key});
+  final IconData isIcon; // 👈 Define the icon field
+
+  const FancyFAB({
+    required this.onPressed,
+    required this.isIcon, // 👈 Add to constructor
+    super.key,
+  });
 
   @override
   State<FancyFAB> createState() => _FancyFABState();
@@ -50,13 +56,6 @@ class _FancyFABState extends State<FancyFAB>
             end: Alignment.bottomRight,
           ),
           shape: BoxShape.circle,
-          // boxShadow: [
-          //   BoxShadow(
-          //     color: Colors.blue.withOpacity(0.5),
-          //     blurRadius: 12,
-          //     offset: const Offset(0, 6),
-          //   ),
-          // ],
         ),
         child: AnimatedBuilder(
           animation: _controller,
@@ -66,7 +65,7 @@ class _FancyFABState extends State<FancyFAB>
               child: child,
             );
           },
-          child: const Icon(Icons.add, color: Colors.white, size: 32),
+          child: Icon(widget.isIcon, color: Colors.white, size: 32), // ✅ fixed
         ),
       ),
     );

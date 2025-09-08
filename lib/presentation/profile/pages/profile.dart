@@ -78,6 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
         //   ],
         // ),
         floatingActionButton: FancyFAB(
+          isIcon: Icons.add,
           onPressed: () {
             Navigator.push(
               context,
