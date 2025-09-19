@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<String> generateText(String prompt) async {
   final url = Uri.parse(
@@ -9,8 +10,7 @@ Future<String> generateText(String prompt) async {
   final response = await http.post(
     url,
     headers: {
-      'Authorization':
-          'Bearer REMOVED', // <-- your token
+      'Authorization': 'Bearer ${dotenv.env['HF_API_KEY']}',
       'Content-Type': 'application/json',
     },
     body: jsonEncode({

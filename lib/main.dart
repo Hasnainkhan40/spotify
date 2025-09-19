@@ -45,10 +45,8 @@ Future<void> main() async {
 
   await Hive.openBox('favorites');
   await Hive.openBox<SongEntity>('last_song');
-  await initDependencies(
-    geminiApiKey: 'REMOVED',
-  );
-  // await dotenv.load(fileName: ".env");
+  await initDependencies(geminiApiKey: dotenv.env['GEMINI_API_KEY']!);
+  await dotenv.load(fileName: ".env");
 
   // Provide your Hugging Face API key here (or load from secure storage / remote config).
   // const hfApiKey = String.fromEnvironment(
