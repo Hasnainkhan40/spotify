@@ -160,11 +160,21 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                             children: [
                               Text(
                                 formatDuration(state.position),
-                                style: const TextStyle(color: Colors.white),
+                                style: TextStyle(
+                                  color:
+                                      context.isDarkMode
+                                          ? Colors.white
+                                          : Colors.black87,
+                                ),
                               ),
                               Text(
                                 formatDuration(state.duration),
-                                style: const TextStyle(color: Colors.white),
+                                style: TextStyle(
+                                  color:
+                                      context.isDarkMode
+                                          ? Colors.white
+                                          : Colors.black87,
+                                ),
                               ),
                             ],
                           ),
@@ -224,7 +234,7 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                                         : Icons.play_arrow,
                                     color:
                                         context.isDarkMode
-                                            ? Color(0xff42C83C)
+                                            ? Colors.white
                                             : Colors.white,
                                     size: 40,
                                   ),

@@ -25,7 +25,6 @@ import 'data/repository/song/song_repository_impl.dart';
 import 'data/sources/song/song_firebase_service.dart';
 import 'domain/repository/song/song.dart';
 import 'domain/usecases/auth/sigin.dart';
-import 'package:http/http.dart' as http; // ✅ t
 
 final sl = GetIt.instance;
 
