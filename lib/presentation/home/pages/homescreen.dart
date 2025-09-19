@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage>
           builder:
               (_) => BlocProvider(
                 create: (_) => sl<ChatBloc>(),
-                child: const ChatScreen(),
+                child: const ChatPage(),
               ),
         ),
       );
@@ -83,38 +83,38 @@ class _HomePageState extends State<HomePage>
       const Favaritessong(),
       const SizedBox.shrink(), // unused placeholder for AI tab
       const ProfilePage(),
+      // const AddSongs(),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FancyFAB(
-        isIcon: Icons.play_arrow_rounded,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (BuildContext context) => SongPlayerPage(
-                    songEntity:
-                        lastSong ??
-                        SongEntity(
-                          title: 'Default Song',
-                          artist: 'Unknown Artist',
-                          imageUrl: '',
-                          duration: 0,
-                          songUrl: '',
-                          isFavorite: false,
-                          releaseDate: DateTime.now(),
-                          songId: '',
-                        ),
-                  ),
-            ),
-          );
-        },
-      ),
-
+      // floatingActionButton: FancyFAB(
+      //   isIcon: Icons.play_arrow_rounded,
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder:
+      //             (BuildContext context) => SongPlayerPage(
+      //               songEntity:
+      //                   lastSong ??
+      //                   SongEntity(
+      //                     title: 'Default Song',
+      //                     artist: 'Unknown Artist',
+      //                     imageUrl: '',
+      //                     duration: 0,
+      //                     songUrl: '',
+      //                     isFavorite: false,
+      //                     releaseDate: DateTime.now(),
+      //                     songId: '',
+      //                   ),
+      //             ),
+      //       ),
+      //     );
+      //   },
+      // ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Container(
@@ -184,30 +184,63 @@ class _HomePageState extends State<HomePage>
 
       body:
           _selectedIndex == 0
-              ? SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _homeTopCard(),
-                    SizedBox(height: 40),
-                    _tabs(),
-                    SizedBox(height: 25),
-                    Divider(),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: const [
-                          NewsSongs(),
-                          Center(child: Text("Videos")),
-                          Center(child: Text("Artists")),
-                          Center(child: Text("Podcasts")),
-                        ],
-                      ),
+              ? Stack(
+                children: [
+                  SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _homeTopCard(),
+                        SizedBox(height: 40),
+                        _tabs(),
+                        SizedBox(height: 25),
+                        Divider(),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.3,
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: const [
+                              NewsSongs(),
+                              Center(child: Text("Videos")),
+                              Center(child: Text("Artists")),
+                              Center(child: Text("Podcasts")),
+                            ],
+                          ),
+                        ),
+                        const PlayList(),
+                      ],
                     ),
-                    const PlayList(),
-                  ],
-                ),
+                  ),
+                  Positioned(
+                    bottom: 20,
+                    right: 20,
+                    child: FancyFAB(
+                      isIcon: Icons.play_arrow_rounded,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (BuildContext context) => SongPlayerPage(
+                                  songEntity:
+                                      lastSong ??
+                                      SongEntity(
+                                        title: 'Default Song',
+                                        artist: 'Unknown Artist',
+                                        imageUrl: '',
+                                        duration: 0,
+                                        songUrl: '',
+                                        isFavorite: false,
+                                        releaseDate: DateTime.now(),
+                                        songId: '',
+                                      ),
+                                ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               )
               : _pages[_selectedIndex],
 

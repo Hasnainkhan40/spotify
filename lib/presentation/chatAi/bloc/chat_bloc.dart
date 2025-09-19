@@ -1,59 +1,96 @@
-import 'dart:async';
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotify/domain/entities/message.dart';
 import 'package:spotify/domain/usecases/send_message_usecase.dart';
-import 'package:uuid/uuid.dart';
+// import '../../domain/entities/message.dart';
+// import '../../domain/usecases/send_message_usecase.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
+import 'package:uuid/uuid.dart';
+
+// class ChatBloc extends Bloc<ChatEvent, ChatState> {
+//   final SendMessageUseCase sendMessageUseCase;
+//   final List<Message> _messages = [];
+
+//   ChatBloc({required this.sendMessageUseCase}) : super(ChatInitial()) {
+//     on<SendMessageEvent>((event, emit) async {
+//       // Add user message
+//       final userMessage = Message(
+//         id: const Uuid().v4(),
+//         text: event.text,
+//         sender: Sender.user,
+//         timestamp: DateTime.now(),
+//       );
+//       _messages.add(userMessage);
+//       emit(ChatLoaded(List.from(_messages)));
+
+//       // Emit loading
+//       //      emit(ChatLoading());
+
+//       try {
+//         // Wrap the text in SendMessageParams
+//         final botMessage = await sendMessageUseCase(
+//           SendMessageParams(event.text),
+//         );
+
+//         // Add bot message to list
+//         _messages.add(botMessage);
+//         emit(ChatLoaded(List.from(_messages)));
+//       } catch (e) {
+//         emit(ChatError(e.toString()));
+//       }
+//     });
+//   }
+// }
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final SendMessageUseCase sendMessageUseCase;
-  final Uuid _uuid = const Uuid();
+  final List<Message> _messages = [];
 
-  ChatBloc({required this.sendMessageUseCase}) : super(ChatState.initial()) {
-    on<SendUserMessageEvent>(_onSendUserMessage);
-    on<ClearChatEvent>(_onClearChat);
-  }
-
-  Future<void> _onSendUserMessage(
-    SendUserMessageEvent event,
-    Emitter<ChatState> emit,
-  ) async {
-    final userMsg = ChatMessage(
-      id: _uuid.v4(),
-      text: event.text,
-      sender: Sender.user,
-    );
-
-    // Immediately add user's message for responsiveness
-    final updated = List<ChatMessage>.from(state.messages)..add(userMsg);
-    emit(state.copyWith(messages: updated, isTyping: true, error: null));
-
-    try {
-      // Call the usecase
-      final reply = await sendMessageUseCase(SendMessageParams(event.text));
-
-      final assistantMsg = ChatMessage(
-        id: _uuid.v4(),
-        text: reply,
-        sender: Sender.assistant,
+  ChatBloc({required this.sendMessageUseCase}) : super(ChatInitial()) {
+    on<SendMessageEvent>((event, emit) async {
+      // 1️⃣ Add user message
+      final userMessage = Message(
+        id: const Uuid().v4(),
+        text: event.text,
+        sender: Sender.user,
+        timestamp: DateTime.now(),
       );
+      _messages.add(userMessage);
+      emit(ChatLoaded(List.from(_messages)));
 
-      final newList = List<ChatMessage>.from(state.messages)..add(assistantMsg);
-      emit(state.copyWith(messages: newList, isTyping: false));
-    } catch (e) {
-      // error handling: show error on state and stop typing
-      emit(state.copyWith(isTyping: false, error: e.toString()));
-    }
-  }
+      // 2️⃣ Add temporary "Bot is typing..." message
+      final typingMessage = Message(
+        id: const Uuid().v4(),
+        text: "Bot is typing...",
+        sender: Sender.bot,
+        timestamp: DateTime.now(),
+      );
+      _messages.add(typingMessage);
+      emit(ChatLoaded(List.from(_messages)));
 
-  void _onClearChat(ClearChatEvent event, Emitter<ChatState> emit) {
-    emit(ChatState.initial());
-  }
+      try {
+        // 3️⃣ Calculate dynamic delay based on user message length
+        int delayMs = (event.text.length * 100 ~/ 10); // 10 chars per 100ms
+        if (delayMs < 500) delayMs = 500; // minimum 0.5s
+        if (delayMs > 2500) delayMs = 2500; // maximum 2.5s
+        await Future.delayed(Duration(milliseconds: delayMs));
 
-  @override
-  Future<void> close() {
-    // Nothing to dispose here beyond super
-    return super.close();
+        // 4️⃣ Call Gemini API
+        final botMessage = await sendMessageUseCase(
+          SendMessageParams(event.text),
+        );
+
+        // 5️⃣ Remove the typing message
+        _messages.removeWhere((msg) => msg.text == "Bot is typing...");
+
+        // 6️⃣ Add actual bot reply
+        _messages.add(botMessage);
+        emit(ChatLoaded(List.from(_messages)));
+      } catch (e) {
+        // Remove typing message if error occurs
+        _messages.removeWhere((msg) => msg.text == "Bot is typing...");
+        emit(ChatError(e.toString()));
+      }
+    });
   }
 }

@@ -2,7 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:spotify/data/repository/auth/auth_repository_impl.dart';
 import 'package:spotify/data/repository/chat_repository_impl.dart';
 import 'package:spotify/data/sources/auth/auth_firebase_service.dart';
-import 'package:spotify/data/sources/hf_BaEvaSDwpbfTziykKpDWDjepfhORiBzrHSinference_datasource.dart';
+import 'package:spotify/data/sources/chat_remote_datasource.dart';
 import 'package:spotify/domain/repository/auth/auth.dart';
 import 'package:spotify/domain/repository/chat_repository.dart';
 import 'package:spotify/domain/usecases/auth/get_user.dart';
@@ -29,28 +29,18 @@ import 'package:http/http.dart' as http; // ✅ t
 
 final sl = GetIt.instance;
 
-Future<void> initInjection({
-  required String hfApiKey,
-  String modelId = 'gpt2',
-}) async {
-  // External
-  sl.registerLazySingleton<http.Client>(() => http.Client());
-
-  // Data source
-  sl.registerLazySingleton<HuggingFaceInferenceDataSource>(
-    () => HuggingFaceInferenceDataSource(apiKey: hfApiKey, client: sl()),
+Future<void> initDependencies({required String geminiApiKey}) async {
+  // Data layer
+  sl.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSource(geminiApiKey),
   );
 
-  // Repository
-  // Register repository
-  sl.registerLazySingleton<ChatRepository>(
-    // 👈 register as interface
-    () => ChatRepositoryImpl(dataSource: sl(), modelId: modelId),
-  );
-  // UseCase
+  sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(sl()));
+
+  // Domain
   sl.registerLazySingleton(() => SendMessageUseCase(sl()));
 
-  // Bloc - register factory so new instance can be created per-screen if needed
+  // Presentation
   sl.registerFactory(() => ChatBloc(sendMessageUseCase: sl()));
 }
 

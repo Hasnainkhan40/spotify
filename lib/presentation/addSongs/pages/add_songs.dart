@@ -145,49 +145,6 @@ class _AddSongsState extends State<AddSongs> {
     }
   }
 
-  // void _saveSong() {
-  //   final title = titleController.text.trim();
-  //   final artist = artistController.text.trim();
-  //   final releaseDateText = releaseDateController.text.trim();
-
-  //   if (title.isEmpty ||
-  //       artist.isEmpty ||
-  //       _selectedSongPath == null ||
-  //       releaseDateText.isEmpty ||
-  //       _calculatedDuration == null) {
-  //     showDialog(
-  //       context: context,
-  //       builder:
-  //           (_) => const AlertDialog(
-  //             content: Text(
-  //               "Please fill all the fields and select a song file",
-  //             ),
-  //           ),
-  //     );
-  //     return;
-  //   }
-
-  //   DateTime parsedReleaseDate;
-  //   try {
-  //     parsedReleaseDate = DateTime.parse(releaseDateText);
-  //   } catch (_) {
-  //     parsedReleaseDate = DateTime.now();
-  //   }
-
-  //   final song = SongEntity(
-  //     title: title,
-  //     artist: artist,
-  //     imageUrl: _selectedImage?.path ?? '',
-  //     duration: _calculatedDuration!,
-  //     releaseDate: parsedReleaseDate,
-  //     isFavorite: false,
-  //     songId: const Uuid().v4(),
-  //     songUrl: '', // Upload later
-  //   );
-
-  //   context.read<StoreSongBloc>().add(StoreSongRequested(song));
-  // }
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<StoreSongBloc, StoreSongState>(
@@ -215,7 +172,7 @@ class _AddSongsState extends State<AddSongs> {
       child: Scaffold(
         backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
         appBar: BasicAppbar(
-          hideBack: true,
+          // hideBack: true,
           title: SvgPicture.asset(AppVectors.logo, height: 40, width: 40),
         ),
         body: Padding(
@@ -387,7 +344,7 @@ class _AddSongsState extends State<AddSongs> {
                       backgroundColor:
                           context.isDarkMode
                               ? const Color(0xff42C83C)
-                              : Colors.black,
+                              : Color(0xff42C83C),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),

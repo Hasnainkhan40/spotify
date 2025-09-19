@@ -1,302 +1,237 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spotify/domain/entities/message.dart';
+import 'package:spotify/common/helpers/is_dark_mode.dart';
 import 'package:spotify/presentation/chatAi/bloc/chat_bloc.dart';
 import 'package:spotify/presentation/chatAi/bloc/chat_event.dart';
 import 'package:spotify/presentation/chatAi/bloc/chat_state.dart';
-// import '../../domain/entities/chat_message.dart';
-// import '../bloc/chat_bloc.dart';
-// import '../bloc/chat_event.dart';
-// import '../bloc/chat_state.dart';
-// import 'package:intl/intl.dart';
-import 'package:intl/intl.dart'; // ✅ add this
+import 'package:spotify/presentation/chatAi/chat_bubble.dart';
+import 'package:spotify/presentation/chatAi/typing_indicator.dart';
+import 'package:spotify/presentation/home/pages/homescreen.dart';
 
-class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+class ChatPage extends StatefulWidget {
+  const ChatPage({super.key});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
+class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  late ChatBloc _chatBloc;
 
-  @override
-  void initState() {
-    super.initState();
-    _chatBloc = context.read<ChatBloc>();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _send() {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
-    _chatBloc.add(SendUserMessageEvent(text));
-    _controller.clear();
-    // scroll to bottom a bit after layout
-    Future.delayed(const Duration(milliseconds: 200), _scrollToBottom);
-  }
-
-  void _scrollToBottom() {
-    if (!_scrollController.hasClients) return;
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent + 100,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
-  }
-
-  Widget _buildBubble(ChatMessage msg) {
-    final isUser = msg.sender == Sender.user;
-    final align = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-    final radius = Radius.circular(14);
-    final bg =
-        isUser
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).cardColor;
-    final txtColor =
-        isUser
-            ? Colors.white
-            : Theme.of(context).textTheme.bodyLarge?.color; // ✅ new
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-      child: Column(
-        crossAxisAlignment: align,
-        children: [
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.78,
-            ),
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.only(
-                topLeft: radius,
-                topRight: radius,
-                bottomLeft: isUser ? radius : Radius.circular(4),
-                bottomRight: isUser ? Radius.circular(4) : radius,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  offset: const Offset(0, 2),
-                  blurRadius: 6,
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            child: Text(
-              msg.text,
-              style: TextStyle(color: txtColor, height: 1.4),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            DateFormat.Hm().format(msg.timestamp),
-            style: Theme.of(context).textTheme.bodySmall, // ✅ new
-          ),
-        ],
-      ),
-    );
+  void _scrollToEnd() {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor:
+          context.isDarkMode ? Color(0xff0D0C0C) : Colors.grey.shade100,
       appBar: AppBar(
-        title: const Text('Assistant'),
+        elevation: 0,
         centerTitle: true,
-        elevation: 1,
+        title: const Text(
+          'AI Assistant 🤖',
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+        ),
+        backgroundColor:
+            context.isDarkMode
+                ? Colors.black.withOpacity(0.9)
+                : Colors.white.withOpacity(0.9),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_sharp,
+            color: context.isDarkMode ? Colors.white : Colors.blueAccent,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: BlocConsumer<ChatBloc, ChatState>(
-                listener: (context, state) {
-                  if (state.isTyping) _scrollToBottom();
-                  if (state.error != null) {
-                    final snack = SnackBar(
-                      content: Text('Error: ${state.error}'),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snack);
-                  }
-                },
-                builder: (context, state) {
-                  final messages = state.messages;
-                  return Stack(
-                    children: [
-                      ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.only(top: 12, bottom: 100),
-                        itemCount: messages.length,
-                        itemBuilder: (context, i) {
-                          final msg = messages[i];
-                          return AnimatedSize(
-                            duration: const Duration(milliseconds: 250),
-                            curve: Curves.easeInOut,
-                            child: Align(
-                              alignment:
-                                  msg.sender == Sender.user
-                                      ? Alignment.centerRight
-                                      : Alignment.centerLeft,
-                              child: _buildBubble(msg),
-                            ),
-                          );
-                        },
-                      ),
-                      // typing indicator
-                      if (state.isTyping)
-                        Positioned(
-                          left: 16,
-                          bottom: 86,
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: theme.cardColor,
-                                  borderRadius: BorderRadius.circular(18),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 6,
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: const [
-                                    SizedBox(
-                                      width: 6,
-                                      height: 6,
-                                      child: _AnimatedDot(),
-                                    ),
-                                    SizedBox(width: 6),
-                                    // simple textual indicator
-                                    Text('Assistant is typing...'),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
-            ),
+      body: Column(
+        children: [
+          // Chat Messages
+          Expanded(
+            child: BlocBuilder<ChatBloc, ChatState>(
+              builder: (context, state) {
+                List messages = [];
+                bool isLoading = false;
 
-            // input area
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              color: theme.scaffoldBackgroundColor,
+                if (state is ChatLoaded) messages = state.messages;
+                if (state is ChatLoading) isLoading = true;
+
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => _scrollToEnd(),
+                );
+
+                return Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors:
+                          context.isDarkMode
+                              ? [Color(0xff0D0C0C), Color(0xff0D0C0C)]
+                              : [Colors.white, Colors.blue.shade50],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    itemCount: messages.length + (isLoading ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (isLoading && index == messages.length) {
+                        return const TypingIndicator();
+                      }
+                      return ChatBubble(message: messages[index]);
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // Message Input
+          SafeArea(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color:
+                    context.isDarkMode
+                        ? Color(0xff0D0C0C)
+                        : Colors.blue.shade50,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 8,
+                    color: Colors.black.withOpacity(0.05),
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
               child: Row(
                 children: [
+                  // Text Field
                   Expanded(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 140),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(32),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.blueAccent.withOpacity(0.08),
+                            Colors.purpleAccent.withOpacity(0.08),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.07),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
                       child: TextField(
                         controller: _controller,
-                        textCapitalization: TextCapitalization.sentences,
                         minLines: 1,
-                        maxLines: 6,
+                        maxLines: 5,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white.withOpacity(
+                                    0.9,
+                                  ) // ✅ Light text in dark mode
+                                  : Colors.black87, // ✅ Dark text in light mode
+                          fontWeight: FontWeight.w500,
+                        ),
+                        cursorColor: Colors.blueAccent, // ✅ Matches send button
                         decoration: InputDecoration(
-                          hintText: 'Send a message...',
-                          filled: true,
-                          fillColor: theme.cardColor,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
                           contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 12,
+                            vertical: 14,
+                            horizontal: 18,
+                          ),
+                          hintText: "Message...",
+                          hintStyle: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white.withOpacity(
+                                      0.4,
+                                    ) // ✅ Softer hint in dark mode
+                                    : Colors
+                                        .grey
+                                        .shade600, // ✅ Softer hint in light mode
+                          ),
+                          filled: true,
+                          fillColor:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.grey.shade900.withOpacity(0.8)
+                                  : Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(32),
+                            borderSide: BorderSide.none,
                           ),
                         ),
-                        onSubmitted: (_) => _send(),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  // modern send button
+
+                  const SizedBox(width: 12),
+
+                  // Modern Send Button
                   GestureDetector(
-                    onTap: _send,
+                    onTap: () {
+                      if (_controller.text.isNotEmpty) {
+                        context.read<ChatBloc>().add(
+                          SendMessageEvent(_controller.text),
+                        );
+                        _controller.clear();
+                      }
+                    },
                     child: Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            theme.colorScheme.primary,
-                            theme.colorScheme.secondary,
-                          ],
-                        ),
                         shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors:
+                              context.isDarkMode
+                                  ? [Color(0xff42C83C), Color(0xff42C83C)]
+                                  : [Colors.lightBlue, Colors.blueAccent],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         boxShadow: [
-                          BoxShadow(color: Colors.black26, blurRadius: 8),
+                          BoxShadow(
+                            color: Colors.blueAccent.withOpacity(0.4),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
                         ],
                       ),
-                      child: const Icon(Icons.send, color: Colors.white),
+                      child: const Icon(
+                        Icons.send_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
-}
-
-/// tiny bouncing dot used as typing indicator
-class _AnimatedDot extends StatefulWidget {
-  const _AnimatedDot();
-
-  @override
-  State<_AnimatedDot> createState() => _AnimatedDotState();
-}
-
-class _AnimatedDotState extends State<_AnimatedDot>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _c;
-  late Animation<double> _a;
-
-  @override
-  void initState() {
-    super.initState();
-    _c = AnimationController(
-      duration: const Duration(milliseconds: 900),
-      vsync: this,
-    )..repeat();
-    _a = Tween<double>(
-      begin: 0.2,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _c, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _a,
-      child: const Icon(Icons.brightness_1, size: 8),
     );
   }
 }

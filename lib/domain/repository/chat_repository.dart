@@ -1,4 +1,5 @@
+import '../entities/message.dart';
+
 abstract class ChatRepository {
-  /// Send user prompt and return assistant reply.
-  Future<String> getReply(String prompt);
+  Future<Message> getReply(String prompt); // must match use case
 }

@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotify/common/helpers/is_dark_mode.dart';
-import 'package:spotify/domain/entities/song/song_entity.dart';
+import 'package:spotify/common/widgets/appbar/app_bar.dart';
+
 import 'package:spotify/presentation/searchScreen/cubit/search_cubit.dart';
 import 'package:spotify/presentation/searchScreen/cubit/search_state.dart';
 import '../../../../../service_locator.dart';
@@ -30,12 +31,7 @@ class _SearchPageState extends State<SearchPage> {
       child: Builder(
         builder: (context) {
           return Scaffold(
-            appBar: AppBar(
-              title: const Text("Search Songs"),
-              centerTitle: true,
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-            ),
+            appBar: BasicAppbar(title: Text('Search Songs')),
             body: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -58,9 +54,12 @@ class _SearchPageState extends State<SearchPage> {
                         Expanded(
                           child: TextField(
                             controller: searchController,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
-                              color: Colors.white,
+                              color:
+                                  context.isDarkMode
+                                      ? Colors.white
+                                      : Colors.black87,
                             ),
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
@@ -69,8 +68,11 @@ class _SearchPageState extends State<SearchPage> {
                               ),
                               border: InputBorder.none,
                               hintText: "Search...",
-                              hintStyle: const TextStyle(
-                                color: Colors.grey,
+                              hintStyle: TextStyle(
+                                color:
+                                    context.isDarkMode
+                                        ? Colors.grey
+                                        : Colors.black87,
                                 fontSize: 16,
                               ),
                             ),

@@ -28,11 +28,11 @@ class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
               ? null
               : IconButton(
                 onPressed: () {
-                  //Navigator.pop(context);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HomePage()),
-                  );
+                  Navigator.pop(context);
+                  // Navigator.pushReplacement(
+                  //   context,
+                  //   MaterialPageRoute(builder: (_) => const HomePage()),
+                  // );
                 },
                 icon: Container(
                   height: 50,

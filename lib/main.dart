@@ -45,9 +45,11 @@ Future<void> main() async {
 
   await Hive.openBox('favorites');
   await Hive.openBox<SongEntity>('last_song');
-  await dotenv.load(fileName: ".env");
-  final hfApiKey = dotenv.env['HF_API_KEY'] ?? '';
-  await di.initInjection(hfApiKey: hfApiKey, modelId: 'gpt2');
+  await initDependencies(
+    geminiApiKey: 'REMOVED',
+  );
+  // await dotenv.load(fileName: ".env");
+
   // Provide your Hugging Face API key here (or load from secure storage / remote config).
   // const hfApiKey = String.fromEnvironment(
   //   'HF_API_KEY',

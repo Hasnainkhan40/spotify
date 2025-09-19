@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:spotify/common/helpers/is_dark_mode.dart';
 import 'package:spotify/common/widgets/appbar/app_bar.dart';
 import 'package:spotify/domain/entities/song/song_entity.dart';
 import 'package:spotify/presentation/song_player/bloc/song_player_cubit.dart';
@@ -175,7 +176,13 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               IconButton(
-                                icon: Icon(Icons.shuffle),
+                                icon: Icon(
+                                  Icons.shuffle,
+                                  color:
+                                      context.isDarkMode
+                                          ? Colors.white
+                                          : Colors.black87,
+                                ),
                                 color: shuffleColor,
                                 onPressed:
                                     () =>
@@ -184,7 +191,14 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                                             .toggleShuffle(),
                               ),
                               IconButton(
-                                icon: Icon(Icons.skip_previous, size: 34),
+                                icon: Icon(
+                                  Icons.skip_previous,
+                                  size: 34,
+                                  color:
+                                      context.isDarkMode
+                                          ? Colors.white
+                                          : Colors.black87,
+                                ),
                                 onPressed:
                                     () =>
                                         context
@@ -208,13 +222,23 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                                     state.isPlaying
                                         ? Icons.pause
                                         : Icons.play_arrow,
-                                    color: Colors.white,
+                                    color:
+                                        context.isDarkMode
+                                            ? Color(0xff42C83C)
+                                            : Colors.white,
                                     size: 40,
                                   ),
                                 ),
                               ),
                               IconButton(
-                                icon: Icon(Icons.skip_next, size: 34),
+                                icon: Icon(
+                                  Icons.skip_next,
+                                  size: 34,
+                                  color:
+                                      context.isDarkMode
+                                          ? Colors.white
+                                          : Colors.black87,
+                                ),
                                 onPressed:
                                     () =>
                                         context
@@ -222,7 +246,13 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                                             .playNext(),
                               ),
                               IconButton(
-                                icon: Icon(repeatIcon),
+                                icon: Icon(
+                                  repeatIcon,
+                                  color:
+                                      context.isDarkMode
+                                          ? Colors.white
+                                          : Colors.black87,
+                                ),
                                 color: repeatColor,
                                 onPressed:
                                     () =>

@@ -1,16 +1,8 @@
-import 'package:equatable/equatable.dart';
+// import '../../domain/entities/message.dart';
 
-abstract class ChatEvent extends Equatable {
-  @override
-  List<Object?> get props => [];
-}
+abstract class ChatEvent {}
 
-class SendUserMessageEvent extends ChatEvent {
+class SendMessageEvent extends ChatEvent {
   final String text;
-  SendUserMessageEvent(this.text);
-
-  @override
-  List<Object?> get props => [text];
+  SendMessageEvent(this.text);
 }
-
-class ClearChatEvent extends ChatEvent {}

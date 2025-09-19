@@ -1,12 +1,7 @@
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:spotify/common/helpers/is_dark_mode.dart';
-import 'package:spotify/common/widgets/appbar/app_bar.dart';
 import 'package:spotify/domain/usecases/auth/get_user.dart';
 import 'package:spotify/presentation/auth/pages/signup.dart';
 import 'package:spotify/presentation/profile/bloc/favorite_songs_cubit.dart';
@@ -67,36 +62,56 @@ class _ProfilePageState extends State<ProfilePage> {
         //   actions: [
         //     Align(
         //       alignment: Alignment.centerRight,
-        //       child: IconButton(
-        //         icon: Icon(
-        //           Icons.logout,
-        //           color: context.isDarkMode ? Colors.white : Colors.white,
-        //         ),
-        //         onPressed: () => _logout(context),
-        //       ),
+        // child: IconButton(
+        //   icon: Icon(
+        //     Icons.logout,
+        //     color: context.isDarkMode ? Colors.white : Colors.white,
+        //   ),
+        //   onPressed: () => _logout(context),
+        // ),
         //     ),
         //   ],
         // ),
-        floatingActionButton: FancyFAB(
-          isIcon: Icons.add,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (BuildContext context) => AddSongs()),
-            );
-          },
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: _profileInfo(context),
+        // floatingActionButton: FancyFAB(
+        //   isIcon: Icons.add,
+        //   onPressed: () {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (BuildContext context) => AddSongs()),
+        //     );
+        //   },
+        // ),
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 96),
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: _profileInfo(context),
+                  ),
+                  const SizedBox(height: 30),
+                  _favoriteSongs(),
+                ],
               ),
-              const SizedBox(height: 30),
-              _favoriteSongs(),
-            ],
-          ),
+            ),
+
+            // FAB overlayed on top of scrollable content
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: FancyFAB(
+                isIcon: Icons.add,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AddSongs()),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

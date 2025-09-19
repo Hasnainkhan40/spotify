@@ -1,28 +1,14 @@
-import 'package:spotify/data/sources/hf_BaEvaSDwpbfTziykKpDWDjepfhORiBzrHSinference_datasource.dart';
+import 'package:spotify/data/sources/chat_remote_datasource.dart';
+import 'package:spotify/domain/entities/message.dart';
 import 'package:spotify/domain/repository/chat_repository.dart';
 
 class ChatRepositoryImpl implements ChatRepository {
-  final HuggingFaceInferenceDataSource dataSource;
-  final String modelId;
+  final ChatRemoteDataSource remoteDataSource;
 
-  ChatRepositoryImpl({
-    required this.dataSource,
-    this.modelId = 'gpt2', // default lightweight model - replace as needed
-  });
+  ChatRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<String> getReply(String prompt) async {
-    try {
-      final reply = await dataSource.generateText(
-        modelId: modelId,
-        prompt: prompt,
-        maxTokens: 256,
-      );
-
-      // Optional: basic cleanup
-      return reply.trim();
-    } catch (e) {
-      rethrow;
-    }
+  Future<Message> getReply(String prompt) async {
+    return await remoteDataSource.sendMessage(prompt);
   }
 }
