@@ -168,7 +168,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               color:
                                   context.isDarkMode
                                       ? Colors.white
-                                      : Colors.white,
+                                      : Colors.black,
                             ),
                             onPressed: () => _logout(context),
                           ),

@@ -14,47 +14,31 @@ class FavoriteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => FavoriteButtonCubit(),
+      create:
+          (context) => FavoriteButtonCubit()..initialize(songEntity.isFavorite),
       child: BlocBuilder<FavoriteButtonCubit, FavoriteButtonState>(
         builder: (context, state) {
-          if (state is FavoriteButtonInitial) {
-            return IconButton(
-              onPressed: () async {
-                await context.read<FavoriteButtonCubit>().favoriteButtonUpdated(
-                  songEntity.songId,
-                );
-                if (function != null) {
-                  function!();
-                }
-              },
-              icon: Icon(
-                songEntity.isFavorite
-                    ? Icons.favorite
-                    : Icons.favorite_outline_outlined,
-                size: 25,
-                color: AppColors.darkGrey,
-              ),
-            );
-          }
+          bool isFavorite = songEntity.isFavorite;
 
           if (state is FavoriteButtonUpdated) {
-            return IconButton(
-              onPressed: () {
-                context.read<FavoriteButtonCubit>().favoriteButtonUpdated(
-                  songEntity.songId,
-                );
-              },
-              icon: Icon(
-                state.isFavorite
-                    ? Icons.favorite
-                    : Icons.favorite_outline_outlined,
-                size: 25,
-                color: AppColors.darkGrey,
-              ),
-            );
+            isFavorite = state.isFavorite;
           }
 
-          return Container();
+          return IconButton(
+            onPressed: () async {
+              await context.read<FavoriteButtonCubit>().favoriteButtonUpdated(
+                songEntity.songId,
+              );
+              if (function != null) {
+                function!();
+              }
+            },
+            icon: Icon(
+              isFavorite ? Icons.favorite : Icons.favorite_outline_outlined,
+              size: 25,
+              color: AppColors.darkGrey,
+            ),
+          );
         },
       ),
     );

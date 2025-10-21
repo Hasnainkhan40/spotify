@@ -21,12 +21,20 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // HydratedBloc Storage Init
-  HydratedBloc.storage = await HydratedStorage.build(
+  // HydratedBloc.storage = await HydratedStorage.build(
+  //   storageDirectory:
+  //       kIsWeb
+  //           ? HydratedStorageDirectory.web
+  //           : HydratedStorageDirectory((await getTemporaryDirectory()).path),
+  // );
+
+  final storage = await HydratedStorage.build(
     storageDirectory:
         kIsWeb
-            ? HydratedStorageDirectory.web
-            : HydratedStorageDirectory((await getTemporaryDirectory()).path),
+            ? HydratedStorage.webStorageDirectory
+            : await getTemporaryDirectory(),
   );
+  HydratedBloc.storage = storage;
 
   // Firebase Init
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -42,6 +50,7 @@ Future<void> main() async {
 
   await Hive.openBox('favorites');
   await Hive.openBox<SongEntity>('last_song');
+
   await initDependencies(
     geminiApiKey: 'AIzaSyCAjdzK8HHZEGysMadbED51_XnF_zuuw3Q',
   );

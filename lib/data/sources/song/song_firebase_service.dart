@@ -106,9 +106,13 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
       final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
       final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
-      late bool isFavorite;
-      var user = firebaseAuth.currentUser;
-      String uId = user!.uid;
+      final user = firebaseAuth.currentUser;
+      if (user == null) {
+        print("⚠️ addOrRemoveFavoriteSong: No logged-in user found");
+        return const Left("User not logged in");
+      }
+
+      final String uId = user.uid;
 
       QuerySnapshot favoriteSongs =
           await firebaseFirestore
@@ -118,6 +122,7 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
               .where('songId', isEqualTo: songId)
               .get();
 
+      bool isFavorite;
       if (favoriteSongs.docs.isNotEmpty) {
         await favoriteSongs.docs.first.reference.delete();
         isFavorite = false;
@@ -132,6 +137,7 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
 
       return Right(isFavorite);
     } catch (e) {
+      print("Error in addOrRemoveFavoriteSong(): $e");
       return const Left('An error occurred');
     }
   }
@@ -139,10 +145,14 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
   @override
   Future<bool> isFavoriteSong(String songId) async {
     try {
-      final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-      final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-      var user = firebaseAuth.currentUser;
-      String uId = user!.uid;
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print("⚠️ isFavoriteSong: No user logged in");
+        return false;
+      }
+
+      final firebaseFirestore = FirebaseFirestore.instance;
+      String uId = user.uid;
 
       QuerySnapshot favoriteSongs =
           await firebaseFirestore
@@ -152,12 +162,9 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
               .where('songId', isEqualTo: songId)
               .get();
 
-      if (favoriteSongs.docs.isNotEmpty) {
-        return true;
-      } else {
-        return false;
-      }
+      return favoriteSongs.docs.isNotEmpty;
     } catch (e) {
+      print("Error in isFavoriteSong(): $e");
       return false;
     }
   }
@@ -165,11 +172,16 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
   @override
   Future<Either> getUserFavoriteSongs() async {
     try {
-      final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-      final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-      var user = firebaseAuth.currentUser;
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print("⚠️ getUserFavoriteSongs: No logged-in user found");
+        return const Left("User not logged in");
+      }
+
+      final firebaseFirestore = FirebaseFirestore.instance;
       List<SongEntity> favoriteSongs = [];
-      String uId = user!.uid;
+      String uId = user.uid;
+
       QuerySnapshot favoritesSnapshot =
           await firebaseFirestore
               .collection('Users')
@@ -181,6 +193,9 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
         String songId = element['songId'];
         var song =
             await firebaseFirestore.collection('songs').doc(songId).get();
+
+        if (!song.exists) continue;
+
         SongModel songModel = SongModel.fromJson(song.data()!);
         songModel.isFavorite = true;
         songModel.songId = songId;
@@ -189,7 +204,7 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
 
       return Right(favoriteSongs);
     } catch (e) {
-      print(e);
+      print("Error in getUserFavoriteSongs(): $e");
       return const Left('An error occurred');
     }
   }
