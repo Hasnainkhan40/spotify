@@ -6,7 +6,7 @@ import 'package:spotify/domain/usecases/song/search_song_usecase.dart';
 import 'package:spotify/presentation/searchScreen/cubit/search_state.dart';
 
 class SearchSongCubit extends Cubit<SearchSongState> {
-  final SearchSongUseCase searchSongUseCase; // Injected dependency
+  final SearchSongUseCase searchSongUseCase;
   List<SongEntity> allSongs = [];
 
   SearchSongCubit(this.searchSongUseCase) : super(SearchSongInitial());

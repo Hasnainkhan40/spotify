@@ -23,40 +23,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     super.dispose();
   }
 
-  // Future<void> passwordReset() async {
-  //   final email = emailController.text.trim();
-  //   if (email.isEmpty) {
-  //     showDialog(
-  //       context: context,
-  //       builder:
-  //           (_) => const AlertDialog(
-  //             content: Text("Please enter your email address."),
-  //           ),
-  //     );
-  //     return;
-  //   }
-
-  //   try {
-  //     await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-  //     showDialog(
-  //       context: context,
-  //       builder:
-  //           (_) => const AlertDialog(
-  //             content: Text("Password reset link sent! Check your email."),
-  //           ),
-  //     );
-  //   } on FirebaseAuthException catch (e) {
-  //     showDialog(
-  //       context: context,
-  //       builder:
-  //           (_) => AlertDialog(
-  //             content: Text(e.message ?? "Something went wrong."),
-  //           ),
-  //     );
-  //   }
-  // }
-  // UI → BLoC → UseCase → AuthRepositoryImpl → AuthFirebaseServiceImpl → Firebase
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(

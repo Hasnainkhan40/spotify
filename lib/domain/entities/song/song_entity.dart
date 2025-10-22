@@ -15,7 +15,7 @@ class SongEntity extends HiveObject {
   final String imageUrl;
 
   @HiveField(3)
-  final num duration; // Duration in seconds
+  final num duration;
 
   @HiveField(4)
   final DateTime releaseDate;

@@ -148,13 +148,11 @@ class _ChatPageState extends State<ChatPage> {
                           fontSize: 16,
                           color:
                               Theme.of(context).brightness == Brightness.dark
-                                  ? Colors.white.withOpacity(
-                                    0.9,
-                                  ) // ✅ Light text in dark mode
-                                  : Colors.black87, // ✅ Dark text in light mode
+                                  ? Colors.white.withOpacity(0.9)
+                                  : Colors.black87,
                           fontWeight: FontWeight.w500,
                         ),
-                        cursorColor: Colors.blueAccent, // ✅ Matches send button
+                        cursorColor: Colors.blueAccent,
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                             vertical: 14,
@@ -166,12 +164,8 @@ class _ChatPageState extends State<ChatPage> {
                             fontWeight: FontWeight.w400,
                             color:
                                 Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white.withOpacity(
-                                      0.4,
-                                    ) // ✅ Softer hint in dark mode
-                                    : Colors
-                                        .grey
-                                        .shade600, // ✅ Softer hint in light mode
+                                    ? Colors.white.withOpacity(0.4)
+                                    : Colors.grey.shade600,
                           ),
                           filled: true,
                           fillColor:
@@ -189,7 +183,7 @@ class _ChatPageState extends State<ChatPage> {
 
                   const SizedBox(width: 12),
 
-                  // Modern Send Button
+                  //  Send Button
                   GestureDetector(
                     onTap: () {
                       if (_controller.text.isNotEmpty) {

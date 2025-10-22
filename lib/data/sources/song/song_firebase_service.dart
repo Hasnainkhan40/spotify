@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:spotify/data/models/song/song.dart';
 import 'package:spotify/domain/entities/song/song_entity.dart';
 import 'package:spotify/domain/usecases/song/is_favorite_song.dart';
-import 'package:spotify/domain/usecases/song/is_favorite_song.dart';
 
 import '../../../service_locator.dart';
 
@@ -147,7 +146,7 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        print("⚠️ isFavoriteSong: No user logged in");
+        print(" isFavoriteSong: No user logged in");
         return false;
       }
 
@@ -174,7 +173,7 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        print("⚠️ getUserFavoriteSongs: No logged-in user found");
+        print("getUserFavoriteSongs: No logged-in user found");
         return const Left("User not logged in");
       }
 
@@ -222,7 +221,7 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
 
       final songsCollection = FirebaseFirestore.instance.collection('songs');
 
-      // 🔎 Fetch all songs once
+      // Fetch all songs once
       final snapshot =
           await songsCollection
               .where('title', isGreaterThanOrEqualTo: normalizedQuery)
@@ -241,7 +240,6 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
         }
       }
 
-      // ✅ Run favorite checks in parallel using Future.wait
       final results = await Future.wait(
         matchedSongs.map((songModel) async {
           bool isFavorite = await sl<IsFavoriteSongUseCase>().call(

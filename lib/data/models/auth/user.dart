@@ -10,7 +10,7 @@ class UserModel {
   UserModel.fromJson(Map<String, dynamic> data) {
     fullName = data['name'];
     email = data['email'];
-    imageURL = data['imageURL']; // ✅ Correctly extract image URL
+    imageURL = data['imageURL'];
   }
 }
 

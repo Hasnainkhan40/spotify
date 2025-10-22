@@ -11,6 +11,6 @@ class SendMessageUseCase {
   SendMessageUseCase(this.repository);
 
   Future<Message> call(SendMessageParams params) async {
-    return repository.getReply(params.prompt); // repository method
+    return repository.getReply(params.prompt);
   }
 }

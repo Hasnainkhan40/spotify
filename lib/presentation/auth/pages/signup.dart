@@ -6,7 +6,6 @@ import 'package:spotify/core/configs/assets/app_vectors.dart';
 import 'package:spotify/presentation/auth/pages/signin.dart';
 import 'package:spotify/data/models/auth/create_user_req.dart';
 import 'package:spotify/domain/usecases/auth/signup.dart';
-import 'package:spotify/presentation/auth/pages/signin.dart';
 import 'package:spotify/presentation/home/pages/homescreen.dart';
 import 'package:spotify/service_locator.dart';
 

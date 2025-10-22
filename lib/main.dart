@@ -20,14 +20,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // HydratedBloc Storage Init
-  // HydratedBloc.storage = await HydratedStorage.build(
-  //   storageDirectory:
-  //       kIsWeb
-  //           ? HydratedStorageDirectory.web
-  //           : HydratedStorageDirectory((await getTemporaryDirectory()).path),
-  // );
-
   final storage = await HydratedStorage.build(
     storageDirectory:
         kIsWeb
@@ -56,13 +48,6 @@ Future<void> main() async {
   );
   await dotenv.load(fileName: ".env");
 
-  // Provide your Hugging Face API key here (or load from secure storage / remote config).
-  // const hfApiKey = String.fromEnvironment(
-  //   'HF_API_KEY',
-  //   defaultValue: '<PUT_YOUR_KEY_HERE>',
-  // );
-  // or load from some secure source; do not hardcode in production.
-
   runApp(const MyApp());
 }
 
@@ -75,7 +60,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider(create: (_) => sl<AuthBloc>()),
-        BlocProvider(create: (_) => sl<ChatBloc>()), // provide globally
+        BlocProvider(create: (_) => sl<ChatBloc>()),
         BlocProvider(create: (_) => SongPlayerCubit()),
         BlocProvider<StoreSongBloc>(create: (_) => sl<StoreSongBloc>()),
       ],
