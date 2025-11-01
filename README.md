@@ -23,7 +23,7 @@ A clean, modern Flutter music app using **Firebase**, **BLoC**, **Hive**, **get_
 
 ## 🖼️ Screenshots
 
-|  Demo Ui |  Demo Ui |  Demo Ui |  Demo Ui |
+|   Ui |   Ui |   Ui |   Ui |
 |:--------:|:----------:|:----------:|:----------:|
 | ![Home](assets/screenshots/spotify-1.png) | ![Orders](assets/screenshots/spotify-2.png) | ![Profile](assets/screenshots/spotify-3.png) |  ![Cart](assets/screenshots/spotify-4.png) |
 
